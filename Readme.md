@@ -43,7 +43,15 @@ By implementing this project, we will achieve efficient management and analysis 
 ## Build Data Warehouse
 ![alt text](<picture/star schema.png>)
 
-## User Information
+## Build Date Lake
+Date Lake was splited into four parts, as the figure shown. The establishment of Data Lake leveraged ETL technology by AWS Glue Job.
+
+![alt text](<picture/data lake.png>)
+
+Use Airflow or Lambda to automatically schedule Glue jobs to create a data lake. Data scientists or data analysts can load data from the video-curated-bucket for analysis and store the output in the analytics-sandbox-bucket.
+
+
+## User Information (Semi-structure Data)
 Json Format
 
 ```plaintext
@@ -86,12 +94,15 @@ Based on user Information to build user profile, including:
 +--------+---------+
 ```
 + Q2 What is the average salary across the whole dataset
+```plaintext
 +-----------------+
 |       avg_salary|
 +-----------------+
 |97461.87312420631|
 +-----------------+
+```
 + Q3 On average, what are the top 5 paying jobs? Bottom 5 paying jobs? If there is a tie, please order by title, location
+```plaintext
 +--------------------+---------+-----------+
 |               title| location|mean_salary|
 +--------------------+---------+-----------+
@@ -101,7 +112,10 @@ Based on user Information to build user profile, including:
 |             trimmer| Brisbane|      99022|
 |admin support off...|    Perth|      98975|
 +--------------------+---------+-----------+
+```
 + Q4 Who is currently making the most money
+
+```plaintext
 +---------+------------+--------------------+----------+----------+------+
 |firstName|    lastName|               title|  fromDate|    toDate|salary|
 +---------+------------+--------------------+----------+----------+------+
@@ -117,8 +131,11 @@ Based on user Information to build user profile, including:
 ...
 |   Steven|       Shore|admin support off...|2016-09-23|2024-07-10|159000|
 +---------+------------+--------------------+----------+----------+------+
+```
 
 + Q5 What was the most popular job title started in 2019
+
+```plaintext
 +--------------------+---------+
 |               title|num_title|
 +--------------------+---------+
@@ -133,6 +150,8 @@ Based on user Information to build user profile, including:
 |       sales manager|      175|
 |  pharmacy assistant|      174|
 +--------------------+---------+
+```
+
 + Q6 How many people are currently working
 df_user.withColumn("job_explode",explode("profile.jobHistory"))\
        .withColumn("toDate",col("job_explode.toDate"))\
@@ -146,6 +165,40 @@ df_user.withColumn("job_explode",explode("profile.jobHistory"))\
     
 + Q7 For each person, list only their latest job. Display the first 10 results, ordered by lastName descending, firstName ascending order
 
+```plaintext
++--------------------+---------+---------+--------------------+
+|                  id|firstName| lastName|               title|
++--------------------+---------+---------+--------------------+
+|91df4770-97b6-402...| Michelle|   Zysman|     physiotherapist|
+|6068e4a5-4116-4ae...|    Brant|  Zylstra|    sales consultant|
+|ebe590ab-5ef8-41d...|    Derek|  Zylstra|  service technician|
+|231d590d-0117-475...|   Kelley|    Zylla|safety superinten...|
+|4f903976-f7c0-414...|Katherine|  Zygadlo|   cosmetic injector|
+|46c28eef-561c-429...|   Steven|Zwolinski|corporate consultant|
+|7823aba8-4387-4d3...|    Roger|  Zwinger|Administration Of...|
+|9255973c-f072-40c...|   Connie|   Zwiers|          technician|
+|4988a110-27ce-44f...|     Mike|   Zwiers|           paralegal|
+|67d75e21-71c9-4c3...|    Susan|    Zwieg|  pharmacy assistant|
++--------------------+---------+---------+--------------------+
+```
 
 + Q8  For each person, list their highest paying job along with their first name, last name, salary and the year they made this salary. Store the results in a dataframe, and then print out 10 results
+
+```plaintext
++----------+---------+------+----+
+| firstName| lastName|salary|year|
++----------+---------+------+----+
+|      Mark|      Roy| 83000|2024|
+|     Ramon|   Willis|147000|2019|
+|Evangeline|  Manning|110000|2019|
+|    Samuel| Koesters| 95000|2019|
+|     Lloyd|  Patrick|121000|2024|
+|     James|   Harmon|113000|2024|
+|       Ken|Biagiotti|153000|2024|
+|    Harold|  Spooner|108000|2019|
+|      Lois|   Sutton|110000|2024|
+|      Paul|   Ortega|114000|2024|
++----------+---------+------+----+
+```
+
 
